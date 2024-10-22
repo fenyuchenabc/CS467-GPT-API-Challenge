@@ -21,7 +21,7 @@ class Author:
             )
         self.thread = self.create_thread()
 
-        #self.db = StoryDatabase()
+        self.db = StoryDatabase()
 
     def create_thread(self):
         thread = self.client.beta.threads.create()
@@ -66,7 +66,7 @@ class Author:
                     No need to give "turn to page" sections at the end of choices."""
         response = self.execute(command)
 
-        #self.db.save_story(genre, age, page_count, response)
+        self.db.save_story(genre, age, page_count, response)
         return response
 
     def db_close(self):
@@ -86,7 +86,7 @@ def main():
         if text == 'EXIT':
             print('Goodbye!')
             sleep(2)
-            #Author.db_close()
+            Author.db_close()
             break 
         response = agent.execute(text)
         print('Author: ', response)
