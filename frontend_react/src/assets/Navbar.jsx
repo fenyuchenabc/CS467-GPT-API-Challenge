@@ -5,7 +5,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/">Home</Link>
-      <Link to="/newstory">NewStroy</Link>
+      <Link to="/newstory">Create New Story</Link>
       <Link to="/history">History</Link>
     </nav>
   );

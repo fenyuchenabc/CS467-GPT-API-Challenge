@@ -1,0 +1,46 @@
+.history-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .story-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .story-item {
+    margin-bottom: 10px;
+  }
+  
+  .story-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .story-link:hover {
+    background-color: #e0e0e0;
+    color: #000;
+  }
+  
+  .story-link span {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  

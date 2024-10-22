@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './assets/Navbar';
 import Home from './assets/Home';
 import History from './assets/History';
-import NewStory from './assets/NewStory';
+import CreateNewStory from './assets/CreateNewStory';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/history" element={<History />} />
-        <Route path="/newstory" element={<NewStory />} />
+        <Route path="/newstory" element={<CreateNewStory />} />
       </Routes>
     </Router>
   );

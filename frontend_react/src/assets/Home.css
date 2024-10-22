@@ -1,0 +1,30 @@
+.home-container {
+    text-align: center;
+    padding: 50px;
+  }
+  
+  .main-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .intro-text {
+    font-size: 1.2rem;
+    margin: 0 auto;
+    max-width: 600px;
+    margin-bottom: 40px;
+  }
+  
+  .image-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .storybook-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+  }
+  
