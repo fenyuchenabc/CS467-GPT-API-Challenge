@@ -1,43 +1,22 @@
-import { useState } from "react";
 import "./styles.css";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './assets/Navbar';
+import Home from './assets/Home';
+import History from './assets/History';
+import NewStory from './assets/NewStory';
 
-export default function App() {
-  const[newItem, setNewItem] = useState("");
-
-
+function App() {
   return (
-    <>
-      <form className="new-item-form">
-        <div className="form-row">
-          <label htmlFor="item">New Item</label>
-          <input type="text" id="item" value={newItem} />
-        </div>
-
-        <button className="btn">Add</button>
-      </form>
-
-      <h1 className="header">Todo List</h1>
-
-      <ul className="list">
-        <li>
-          <label>
-            <input type="checkbox" /> Item 1
-          </label>
-          <button className="btn btn-danger">Delete</button>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" /> Item 2
-          </label>
-          <button className="btn btn-danger">Delete</button>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" /> Item 3
-          </label>
-          <button className="btn btn-danger">Delete</button>
-        </li>
-      </ul>
-    </>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/newstory" element={<NewStory />} />
+      </Routes>
+    </Router>
   );
 }
+
+export default App;
