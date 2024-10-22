@@ -2,6 +2,7 @@ from time import sleep
 from openai import OpenAI 
 import os 
 from dotenv import load_dotenv
+from db.database import StoryDatabase
 
 load_dotenv()
 
@@ -19,6 +20,8 @@ class Author:
                 model = 'gpt-4o-mini-2024-07-18' #whatever model we end up using
             )
         self.thread = self.create_thread()
+
+        self.db = StoryDatabase()
 
     def create_thread(self):
         thread = self.client.beta.threads.create()
@@ -59,7 +62,12 @@ class Author:
         command = f"""Write the first page of a(n) {genre} story for a {age} year
                     old child. Finish the story within {page_count} pages."""
         response = self.execute(command)
+
+        self.db.save_story(genre, age, page_count, response)
         return response
+
+    def db_close(self):
+        self.db.close()
 
 def main():
     agent = Author()
@@ -74,6 +82,7 @@ def main():
         if text == 'EXIT':
             print('Goodbye!')
             sleep(2)
+            Author.db_close()
             break 
         response = agent.execute(text)
         print('Author: ', response)
