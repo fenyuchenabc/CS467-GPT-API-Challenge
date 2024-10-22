@@ -13,7 +13,7 @@ class Author:
                         the option to select variou paths in a story. Stories should vary
                         based on genre and age of the child"""
         
-        self.client = OpenAI("CHAT_GPT_API_KEY") #whatever our key is
+        self.client = OpenAI(api_key=os.getenv("GPT_API_KEY")) #whatever our key is
         self.assistant = self.client.beta.assistants.create(
                 name="Script Writer",
                 instructions= writer_job,
