@@ -11,18 +11,19 @@ class StoryDatabase:
             story_id INTEGER PRIMARY KEY AUTOINCREMENT,
             genre VARCHAR(60) NOT NULL,
             age INTEGER NOT NULL,
-            page_count INTEGER NOT NULL,
+            choice_count INTEGER NOT NULL,
+            segment_count INTEGER NOT NULL,
             content TEXT NOT NULL
         )'''
 
         self.sqlconn.execute(query)
         self.sqlconn.commit()
 
-    def save_story(self, genre, age, page_count, content):
-        query = '''INSERT INTO story_data (genre, age, page_count, content)
-                VALUES (?, ?, ?, ?)'''
+    def save_story(self, genre, age, choice_count, segment_count, content):
+        query = '''INSERT INTO story_data (genre, age, choice_count, segment_count, content)
+                VALUES (?, ?, ?, ?, ?)'''
 
-        self.sqlconn.execute(query, (genre, age, page_count, content))
+        self.sqlconn.execute(query, (genre, age, choice_count, segment_count, content))
         self.sqlconn.commit()
 
     def close(self):

@@ -2,7 +2,7 @@ from time import sleep
 from openai import OpenAI 
 import os 
 from dotenv import load_dotenv
-from db.database import StoryDatabase
+from database import StoryDatabase
 
 load_dotenv()
 
