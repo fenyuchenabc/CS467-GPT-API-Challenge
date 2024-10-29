@@ -3,12 +3,15 @@ import './CreateNewStory.css';
 
 function CreateNewStory() {
   const [pageCount, setPageCount] = useState('');
+  const [genre, setGenre] = useState('');
   const [storyText, setStoryText] = useState('');
 
   const handlePageChange = (e) => {
     setPageCount(e.target.value);
   };
-
+  const handleGenreChange = (e) => {
+    setGenre(e.target.value);
+  };
   const handleStoryChange = (e) => {
     setStoryText(e.target.value);
   };
@@ -43,7 +46,24 @@ function CreateNewStory() {
       </div>
 
       <div className="input-group">
-        <label htmlFor="story-text" className="label">Story</label>
+        <label htmlFor="genre" className="label">Genre</label>
+        <select 
+          id="genre" 
+          className="dropdown" 
+          value={genre} 
+          onChange={handleGenreChange}
+        >
+          <option value="">Select a genre</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Science Fiction">Science Fiction</option>
+          <option value="Mystery">Mystery</option>
+          <option value="Educational">Educational</option>
+        </select>
+      </div>
+      
+      <div className="input-group">
+        <label htmlFor="story-text" className="label">Story Idea</label>
         <textarea 
           id="story-text" 
           className="textarea" 

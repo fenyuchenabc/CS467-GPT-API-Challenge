@@ -13,50 +13,65 @@ class Author:
                         the option to select various paths in a story. Stories should vary
                         based on genre and age of the child"""
         
-        self.client = OpenAI(api_key=os.getenv("GPT_API_KEY")) #whatever our key is
-        self.assistant = self.client.beta.assistants.create(
-                name="Script Writer",
-                instructions= writer_job,
-                model = 'gpt-4o-mini-2024-07-18' #whatever model we end up using
-            )
-        self.thread = self.create_thread()
+        try:
+            self.client = OpenAI(api_key=os.getenv("GPT_API_KEY")) #whatever our key is
+            self.assistant = self.client.beta.assistants.create(
+                    name="Script Writer",
+                    instructions= writer_job,
+                    model = 'gpt-4o-mini-2024-07-18' #whatever model we end up using
+                )
+            self.thread = self.create_thread()
 
-        self.db = StoryDatabase()
+            self.db = StoryDatabase()
+        except Exception as e:
+            print(f"Error initializing Author: {e}")
 
     def create_thread(self):
-        thread = self.client.beta.threads.create()
-        return thread
+        try:
+            thread = self.client.beta.threads.create()
+            return thread
+        except Exception as e:
+            print(f"Error creating thread: {e}")
+            return None
     
     def create_message(self, text_input):
-        message = self.client.beta.threads.messages.create(
-            thread_id=self.thread.id,
-            role="user",
-            content=text_input,
-        )
-        return message
-    
+        try:
+            message = self.client.beta.threads.messages.create(
+                thread_id=self.thread.id,
+                role="user",
+                content=text_input,
+            )
+            return message
+        except Exception as e:
+            print(f"Error creating message: {e}")
+            return None
+        
     def writer_thread(self):
         return self.thread
 
     def execute(self, text_input):
-        message = self.create_message(text_input=text_input)
-        run = self.client.beta.threads.runs.create(
-            thread_id = self.thread.id,
-            assistant_id = self.assistant.id,
-        )
-        while run.status == 'queued' or run.status == 'in_progress':
-            run = self.client.beta.threads.runs.retrieve(
+        try:
+            message = self.create_message(text_input=text_input)
+            run = self.client.beta.threads.runs.create(
                 thread_id = self.thread.id,
-                run_id=run.id,
+                assistant_id = self.assistant.id,
             )
-            sleep(.5)
-        messages = self.client.beta.threads.messages.list(
-            thread_id=self.thread.id,
-            order='asc',
-            after=message.id
-            )
-        for m in messages:
-            return m.content[0].text.value
+            while run.status == 'queued' or run.status == 'in_progress':
+                run = self.client.beta.threads.runs.retrieve(
+                    thread_id = self.thread.id,
+                    run_id=run.id,
+                )
+                sleep(.5)
+            messages = self.client.beta.threads.messages.list(
+                thread_id=self.thread.id,
+                order='asc',
+                after=message.id
+                )
+            for m in messages:
+                return m.content[0].text.value
+        except Exception as e:
+            print(f"Error executing story generation: {e}")
+            return "Error during story generation"
     
     def first_page(self, genre, age, choice_count, segment_count):
         command = f"""Write the first page of an interactive {genre} story for a {age} year
@@ -65,8 +80,11 @@ class Author:
                     story to {segment_count} story segments overall before ending the story.
                     No need to give "turn to page" sections at the end of choices."""
         response = self.execute(command)
-
-        self.db.save_story(genre, age, choice_count, segment_count, response)
+        if response and response != "Error during story generation":
+            try:
+                self.db.save_story(genre, age, choice_count, segment_count, response)
+            except Exception as e:
+                print(f"Error saving story to database: {e}")
         return response
 
     def db_close(self):
@@ -75,22 +93,29 @@ class Author:
 def main():
     agent = Author()
     print('Ready!')
-    age = input("How old are you?: ")
-    genre = input("What genre of story would you like to hear?: ")
-    page_count = input("How many pages should this story be?: ")
-    choice_count = input("How many options would you like per page?: ")
-    response = agent.first_page(genre, age, choice_count, page_count)
-    print(response)
-    while True:
-        text = input("USER: ")
-        if text == 'EXIT':
-            print('Goodbye!')
-            sleep(2)
-            Author.db_close()
-            break 
-        response = agent.execute(text)
-        print('Author: ', response)
-        print()
+    try:
+        age = input("How old are you?: ")
+        genre = input("What genre of story would you like to hear?: ")
+        page_count = input("How many pages should this story be?: ")
+        choice_count = input("How many options would you like per page?: ")
+        response = agent.first_page(genre, age, choice_count, page_count)
+        print(response)
+        while True:
+            text = input("USER: ")
+            if text == 'EXIT':
+                print('Goodbye!')
+                sleep(2)
+                Author.db_close()
+                break 
+            response = agent.execute(text)
+            print('Author: ', response)
+            print()
+    except ValueError:
+        print("Invalid input. Please enter numeric values for age, page count, and choice count.")
+    except Exception as e:
+        print(f"Error during execution: {e}")
+    finally:
+        agent.db_close
 
 if __name__ == '__main__':
     main()

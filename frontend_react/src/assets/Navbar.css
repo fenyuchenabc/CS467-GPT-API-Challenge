@@ -7,15 +7,22 @@
     padding: 10px;
   }
   
-  .nav-link {
-    color: #fff;           
-    text-decoration: none;  
-    margin: 0 50px;      
-    font-size: 18px;  
+  .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
   }
   
-  .nav-link:hover {
-    color: #ff9800;
+  .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
   }
-  
-  
+
+  .nav-links a {
+    text-decoration: none;
+    color: #333;
+  }
+
+  .nav-links a:hover {
+    color: #007bff;
+  }

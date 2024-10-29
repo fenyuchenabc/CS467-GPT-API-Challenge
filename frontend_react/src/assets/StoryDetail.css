@@ -1,0 +1,15 @@
+.story-detail-page {
+  padding: 2rem;
+  text-align: center;
+  background-color: #fff;
+}
+
+.story-detail-page h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.story-detail-page p {
+  font-size: 1.2rem;
+  color: #555;
+}
