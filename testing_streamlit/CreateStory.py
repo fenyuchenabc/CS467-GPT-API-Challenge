@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 
+
 def main():
     # Streamlit frontend for "Create New Story"
     st.title("Create a New Story")
@@ -13,7 +14,8 @@ def main():
     if st.button("Create Story"):
         if prompt and pages:
             # Send the user input to the Flask backend
-            response = requests.post("http://localhost:5000/create_story", json={"pages": pages, "prompt": prompt})
+            print(f"Sending to backend: pages={pages}, prompt={prompt}")
+            response = requests.post("http://127.0.0.1:5000/create_story", json={"pages": pages, "prompt": prompt})
 
             if response.status_code == 200:
                 story = response.json().get("story", "")
