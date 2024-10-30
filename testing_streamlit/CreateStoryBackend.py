@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 from openai import OpenAI
 from dotenv import load_dotenv
+from database import init_db, save_story, get_all_stories
 import os
 
 # Set api key
 load_dotenv()
 
 app = Flask(__name__)
+init_db()
 
 class Author:
     def __init__(self):
@@ -33,8 +35,7 @@ what settings in the story look like as well.
             return f"Error: {str(e)}"
 
     def first_page(self, prompt, pages):
-        command = f"""Write a story about {prompt}. The story should have exactly {pages} page(s).
-                  Make sure that the story ends within {pages} page(s)."""
+        command = f"Write a story about {prompt}. Make sure it is exactly {pages} page(s) long, one page is around 300 words and please no page number in the contents"
         response = self.execute(command)
         return response
 
@@ -54,11 +55,20 @@ def create_story():
             return jsonify({"error": "Missing 'pages' or 'prompt'"}), 400
 
         # Generate the first page of the story
-        story = agent.first_page(pages,prompt)
+        story = agent.first_page(pages, prompt)
+        save_story(prompt, story)
         return jsonify({'story': story})
 
     except Exception as e:
         return jsonify({"error": f"Unexpected server error: {str(e)}"}), 500
 
+@app.route('/get_stories', methods=['GET'])
+def get_stories():
+    stories = get_all_stories()
+    stories_list = [{'id': story['id'], 'title': story['title'], 'content': story['content']} for story in stories]
+    return jsonify(stories_list)
+
+
 if __name__ == '__main__':
+    print("Flask app started...")
     app.run(debug=True, port=5000)
