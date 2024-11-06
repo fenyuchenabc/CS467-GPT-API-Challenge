@@ -8,11 +8,11 @@ db = StoryDatabase()
 @app.route('/api/stories', methods=['GET'])
 def get_stories():
     try:
-
+        # Grab DB Tables
         cursor = db.sqlconn.cursor()
         cursor.execute("SELECT * FROM story_data")
         rows = cursor.fetchall()
-
+        # Convert to dict
         stories = [
             {
                 'story_id': row[0],
@@ -24,6 +24,7 @@ def get_stories():
             }
             for row in rows
         ]
+        # Return json for frontend
         return jsonify(stories)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 function StoryList() {
   const [stories, setStories] = useState([]);
-
+  // Connect to flask backend and grab DB
   useEffect(() => {
     fetch('http://localhost:5000/api/stories')
       .then((response) => response.json())
@@ -12,7 +12,7 @@ function StoryList() {
   }, []);
 
   return (
-    // Need to change db entry to take title as well instead of using story ID
+    // Need to change DB entry to take title as well instead of using story ID
     <div className="story-history">
       <h1>Stories</h1>
       {stories.map((story) => (
