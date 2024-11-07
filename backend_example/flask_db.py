@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
-import StoryDatabase
-
+from database import StoryDatabase
+from flask_cors import CORS
 app = Flask(__name__)
 db = StoryDatabase()
+CORS(app)  # allow for remote origins
 
 
 @app.route('/api/stories', methods=['GET'])
