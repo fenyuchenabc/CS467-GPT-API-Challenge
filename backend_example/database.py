@@ -4,7 +4,7 @@ import sqlite3
 class StoryDatabase:
     def __init__(self):
         try:
-            self.sqlconn = sqlite3.connect('story_data.db')
+            self.sqlconn = sqlite3.connect('story_data.db', check_same_thread=False)
             self.create_table()
         except sqlite3.Error as e:
             print(f"Error connecting to database: {e}")
