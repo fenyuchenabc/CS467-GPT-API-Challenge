@@ -8,6 +8,9 @@ load_dotenv()
 
 class Author:
     def __init__(self):
+        """
+        Represents an author that writes stories.
+        """
         writer_job = """You are an author for childrens books. Your job is to create
                         choose your own adventure style stories giving the child
                         the option to select various paths in a story. Stories should vary
@@ -35,6 +38,9 @@ class Author:
             return None
     
     def create_message(self, text_input):
+        """
+        Creates a message for GPT to read. Similar to a text input on the web app.
+        """
         try:
             message = self.client.beta.threads.messages.create(
                 thread_id=self.thread.id,
@@ -50,6 +56,9 @@ class Author:
         return self.thread
 
     def execute(self, text_input):
+        """
+        Executes the input given by the user.
+        """
         try:
             message = self.create_message(text_input=text_input)
             run = self.client.beta.threads.runs.create(
@@ -68,21 +77,32 @@ class Author:
                 after=message.id
                 )
             for m in messages:
-                return m.content[0].text.value
+                response_text = m.content[0].text.value
+                if "The End" in response_text or "end of the story" in response_text:
+                    print(response_text)
+                    print("")
+                    self.db_close()
+                    return "Thank you for reading. The story has concluded!"
+                return response_text
         except Exception as e:
             print(f"Error executing story generation: {e}")
             return "Error during story generation"
     
-    def first_page(self, genre, age, choice_count, segment_count):
+    def first_page(self, genre, age, choice_count, length, key_moments=None):
+        """
+        Initializes the story based on the provided parameters by the reader.
+        """
         command = f"""Write the first page of an interactive {genre} story for a {age} year
                     old child. Give the reader {choice_count} choices per story segment. Only create one
-                    segment at a time before hearing what the reader chooses then move on from there. Keep the 
-                    story to {segment_count} story segments overall before ending the story.
-                    No need to give "turn to page" sections at the end of choices."""
+                    segment at a time before hearing what the reader chooses then move on from there. Try to keep
+                    the story to a {length} length. Always end the story with "The End" and
+                    don't say anything past that. No need to give "turn to page" sections at the end of choices."""
+        if key_moments:
+            command += f" During the story, incorporate the following key moments given by the reader: {key_moments}"
         response = self.execute(command)
         if response and response != "Error during story generation":
             try:
-                self.db.save_story(genre, age, choice_count, segment_count, response)
+                self.db.save_story(genre, age, choice_count, length, response)
             except Exception as e:
                 print(f"Error saving story to database: {e}")
         return response
@@ -96,18 +116,24 @@ def main():
     try:
         age = input("How old are you?: ")
         genre = input("What genre of story would you like to hear?: ")
-        page_count = input("How many pages should this story be?: ")
+        page_count = input("Do you want a short, medium, or long story?: ")
         choice_count = input("How many options would you like per page?: ")
-        response = agent.first_page(genre, age, choice_count, page_count)
+        key_moments = input(
+            "Are there any particular events you want to happen in this story? (Optional. Press Enter to skip.): ")
+        response = agent.first_page(genre, age, choice_count, page_count, key_moments)
         print(response)
         while True:
-            text = input("USER: ")
-            if text == 'EXIT':
+            text = input("Adventurer: ")
+            if text.upper() == 'EXIT':
                 print('Goodbye!')
                 sleep(2)
-                Author.db_close()
-                break 
+                break
             response = agent.execute(text)
+            print("")
+            if "The story has concluded" in response:
+                print(response)
+                print("")
+                break
             print('Author: ', response)
             print()
     except ValueError:
