@@ -114,20 +114,31 @@ def main():
     agent = Author()
     print('Ready!')
     try:
-        age = input("How old are you?: ")
-        genre = input("What genre of story would you like to hear?: ")
-        page_count = input("Do you want a short, medium, or long story?: ")
-        choice_count = input("How many options would you like per page?: ")
-        key_moments = input(
+        # Convert inputs to integers with error handling
+        try:
+            age = int(input("How old are you?: "))
+            page_count = int(input("How many pages should this story be?: "))
+            choice_count = int(input("How many options would you like per page?: "))
+            key_moments = input(
             "Are there any particular events you want to happen in this story? (Optional. Press Enter to skip.): ")
+        except ValueError:
+            print("Invalid input. Please enter numeric values for age, page count, and choice count.")
+            return  # Exit the function if input is invalid
+
+        genre = input("What genre of story would you like to hear?: ")
+
+        # Generate the first page of the story
         response = agent.first_page(genre, age, choice_count, page_count, key_moments)
         print(response)
+        
+        # Interactive loop for continuing the story
         while True:
             text = input("Adventurer: ")
             if text.upper() == 'EXIT':
                 print('Goodbye!')
                 sleep(2)
                 break
+                
             response = agent.execute(text)
             print("")
             if "The story has concluded" in response:
@@ -136,12 +147,10 @@ def main():
                 break
             print('Author: ', response)
             print()
-    except ValueError:
-        print("Invalid input. Please enter numeric values for age, page count, and choice count.")
     except Exception as e:
         print(f"Error during execution: {e}")
     finally:
-        agent.db_close
+        agent.db_close()
 
 if __name__ == '__main__':
     main()
