@@ -118,7 +118,7 @@ def main():
         try:
             age = int(input("How old are you?: "))
             page_count = int(input("How many pages should this story be?: "))
-            choice_count = int(input("How many options would you like per page?: "))
+            choice_count = input("How many options would you like the story to be? (Short, Medium, Long): ")
             key_moments = input(
             "Are there any particular events you want to happen in this story? (Optional. Press Enter to skip.): ")
         except ValueError:
@@ -154,3 +154,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
