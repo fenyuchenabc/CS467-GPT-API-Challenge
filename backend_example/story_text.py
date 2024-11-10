@@ -94,28 +94,38 @@ def main():
     agent = Author()
     print('Ready!')
     try:
-        age = input("How old are you?: ")
+        # Convert inputs to integers with error handling
+        try:
+            age = int(input("How old are you?: "))
+            page_count = int(input("How many pages should this story be?: "))
+            choice_count = int(input("How many options would you like per page?: "))
+        except ValueError:
+            print("Invalid input. Please enter numeric values for age, page count, and choice count.")
+            return  # Exit the function if input is invalid
+
         genre = input("What genre of story would you like to hear?: ")
-        page_count = input("How many pages should this story be?: ")
-        choice_count = input("How many options would you like per page?: ")
+
+        # Generate the first page of the story
         response = agent.first_page(genre, age, choice_count, page_count)
         print(response)
+        
+        # Interactive loop for continuing the story
         while True:
             text = input("USER: ")
-            if text == 'EXIT':
+            if text.upper() == 'EXIT':
                 print('Goodbye!')
                 sleep(2)
-                Author.db_close()
+                agent.db_close()
                 break 
+            
+            # Execute the next part of the story
             response = agent.execute(text)
             print('Author: ', response)
             print()
-    except ValueError:
-        print("Invalid input. Please enter numeric values for age, page count, and choice count.")
     except Exception as e:
         print(f"Error during execution: {e}")
     finally:
-        agent.db_close
+        agent.db_close()
 
 if __name__ == '__main__':
     main()
