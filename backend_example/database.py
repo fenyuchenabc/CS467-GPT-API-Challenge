@@ -35,5 +35,52 @@ class StoryDatabase:
             print(f"Error saving story: {e}")
             return None
 
+    def fetch_story(self, story_id=None, genre=None, age=None):
+        """
+        Fetches story from the database based on provided criteria.
+        
+        story_id (int): optional
+        genre (str): optional
+        age (int): optional
+        
+        Returns a list of dicts. each dict = a story
+        """
+        try:
+            query = "SELECT * FROM story_data WHERE 1=1"
+            parameters = [] # Lsit for query params
+
+            # append based on args
+            if story_id is not None:
+                query += " AND story_id = ?"
+                parameters.append(story_id)
+            if genre is not None:
+                query += " AND genre = ?"
+                parameters.append(genre)
+            if age is not None:
+                query += " AND age = ?"
+                parameters.append(age)
+
+            cursor = self.sqlconn.execute(query, tuple(parameters))
+            results = cursor.fetchall()
+            
+            # Format the output for readability
+            stories = []
+            for row in results:
+                # New dictionary with story details for each row.
+                story = {
+                    'story_id': row[0],
+                    'genre': row[1],
+                    'age': row[2],
+                    'choice_count': row[3],
+                    'segment_count': row[4],
+                    'content': row[5]
+                }
+                stories.append(story)  # update the story dictionary or list
+
+            return stories # list of stories
+        except sqlite3.Error as e:
+            print(f"Error fetching story: {e}")
+            return None
+                    
     def close(self):
         self.sqlconn.close()
