@@ -17,10 +17,12 @@ def main():
         st.session_state["story"] = ""
     if "options" not in st.session_state:
         st.session_state["options"] = []
+    if "session_id" not in st.session_state:
+        st.session_state["session_id"] = None  # This will store the session ID from the backend
 
     # Start story and display initial content with options
     if st.button("Start Story"):
-        response = requests.post("http://127.0.0.1:5000/start_story", json={
+        response = requests.post("http://localhost:5000/start_story", json={
             "genre": genre,
             "age": age,
             "page_count": segment_count,
@@ -28,33 +30,34 @@ def main():
         })
 
         if response.status_code == 200:
-            # Display the initial part of the story
-            story = response.json().get("story", "")
-            st.session_state["story"] = story
-            st.session_state["options"] = extract_options(story)
+            # Capture the session ID and initial story
+            data = response.json()
+            st.session_state["session_id"] = data.get("session_id")
+            st.session_state["story"] = data.get("story", "")
+            st.session_state["options"] = list(range(1, choice_count + 1))  # Options 1 to choice_count
             st.write("Story started successfully!")
-            st.write(story)
+            st.write(st.session_state["story"])
         else:
             st.error("Failed to start the story. Try again.")
 
-    # Check if story and options are set in session state
-    if st.session_state["story"] and st.session_state["options"]:
+    # Check if story, options, and session_id are set in session state
+    if st.session_state["story"] and st.session_state["options"] and st.session_state["session_id"]:
         st.write(st.session_state["story"])
 
         # Display each option as a button
         for i, option in enumerate(st.session_state["options"], 1):
-            if st.button(f"Option {i}: {option}"):
-                # Debugging: Show which option was clicked
-                st.write(f"Option {i} selected")
+            if st.button(f"Option {i}"):
+                # Send selected option to backend with session_id
+                response = requests.post("http://localhost:5000/continue_story", json={
+                    "user_input": str(i),
+                    "session_id": st.session_state["session_id"]
+                })
 
-                # Send selected option to backend
-                response = requests.post("http://127.0.0.1:5000/continue_story", json={"user_input": str(i)})
-                
                 if response.status_code == 200:
                     # Update story and options with new content and choices
                     next_segment = response.json().get("story", "")
                     st.session_state["story"] = next_segment
-                    st.session_state["options"] = extract_options(next_segment)
+                    st.session_state["options"] = list(range(1, choice_count + 1))  # Reset options
                     st.write("Story continued successfully!")
                     st.write(next_segment)
                 else:
