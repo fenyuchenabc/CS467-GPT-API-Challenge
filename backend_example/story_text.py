@@ -122,8 +122,10 @@ def main():
         # Convert inputs to integers with error handling
         try:
             age = int(input("How old are you?: "))
-            page_count = int(input("How many pages should this story be?: "))
-            choice_count = int(input("How many options would you like per page?: "))
+            page_count = input("How long should this story be? (Short, Medium, Long): ")
+            choice_count = int(input("How many options would you like per section?: "))
+            key_moments = input(
+            "Are there any particular events you want to happen in this story? (Optional. Press Enter to skip.): ")
         except ValueError:
             print("Invalid input. Please enter numeric values for age, page count, and choice count.")
             return  # Exit the function if input is invalid
@@ -131,7 +133,7 @@ def main():
         genre = input("What genre of story would you like to hear?: ")
 
         # Generate the first page of the story
-        response = agent.first_page(genre, age, choice_count, page_count)
+        response = agent.first_page(genre, age, choice_count, page_count, key_moments)
         print(response)
         
         # Interactive loop for continuing the story
@@ -157,3 +159,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
