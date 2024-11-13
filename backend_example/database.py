@@ -2,9 +2,9 @@ import sqlite3
 
 
 class StoryDatabase:
-    def __init__(self):
+    def __init__(self, db_path='story_data.db'):
         try:
-            self.sqlconn = sqlite3.connect('story_data.db', check_same_thread=False)
+            self.sqlconn = sqlite3.connect(db_path, check_same_thread=False)
             self.create_table()
         except sqlite3.Error as e:
             print(f"Error connecting to database: {e}")
@@ -20,6 +20,8 @@ class StoryDatabase:
                 content TEXT NOT NULL
             )'''
             self.sqlconn.execute(query)
+            self.sqlconn.execute("CREATE INDEX IF NOT EXISTS idx_genre ON story_data (genre)")
+            self.sqlconn.execute("CREATE INDEX IF NOT EXISTS idx_age ON story_data (age)")
             self.sqlconn.commit()
         except sqlite3.Error as e:
             print(f"Error creating table: {e}")
@@ -81,6 +83,27 @@ class StoryDatabase:
         except sqlite3.Error as e:
             print(f"Error fetching story: {e}")
             return None
+        
+    def fetch_all_stories(self):
+        try:
+            query = "SELECT * FROM story_data"
+            cursor = self.sqlconn.execute(query)
+            results = cursor.fetchall()
+            return [
+                {
+                    'story_id': row[0],
+                    'genre': row[1],
+                    'age': row[2],
+                    'choice_count': row[3],
+                    'segment_count': row[4],
+                    'content': row[5],
+                }
+                for row in results
+            ]
+        except sqlite3.Error as e:
+            print(f"Error fetching all stories: {e}")
+            return None
+
                     
     def close(self):
         self.sqlconn.close()
