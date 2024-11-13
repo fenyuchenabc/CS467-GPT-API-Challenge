@@ -39,6 +39,14 @@ what settings in the story look like as well.
         response = self.execute(command)
         return response
 
+    # Adventure Mode: Generate the first page of a choose-your-own-adventure story
+    def start_adventure_story(self, genre, age, choice_count, segment_count):
+        command = f"""Write the first page of an interactive {genre} story for a {age}-year-old child.
+                      Provide {choice_count} choices per story segment. Only create one segment at a time 
+                      and move to the next only after the reader chooses. Limit the story to {segment_count} segments overall."""
+        return self.execute(command)
+
+
 agent = Author()
 
 # Define the /create_story route
@@ -67,6 +75,42 @@ def get_stories():
     stories = get_all_stories()
     stories_list = [{'id': story['id'], 'title': story['title'], 'content': story['content']} for story in stories]
     return jsonify(stories_list)
+
+# Adventure Mode: Start a new adventure story
+@app.route('/start_story', methods=['POST'])
+def start_story():
+    data = request.json
+    genre = data.get('genre')
+    age = data.get('age')
+    page_count = data.get('page_count')
+    choice_count = data.get('choice_count')
+
+    if not (genre and age and page_count and choice_count):
+        return jsonify({"error": "Missing required adventure story parameters"}), 400
+
+    # Generate the first page of the adventure story
+    story = agent.start_adventure_story(genre, age, choice_count, page_count)
+    return jsonify({'story': story})
+
+# Adventure Mode: Continue the story based on user choice
+@app.route('/continue_story', methods=['POST'])
+def continue_story():
+    user_input = request.json.get('user_input')
+    if not user_input:
+        return jsonify({"error": "Missing 'user_input' for continuing story"}), 400
+    # Debugging: Print user input
+    print(f"Received user input for continuation: {user_input}")
+
+    # Continue the story with user input
+    story = agent.execute(user_input)
+    return jsonify({'story': story})
+    # Debugging: Print the continuation result
+    print(f"Continuation result: {story}")
+
+# Adventure Mode: Exit the adventure story session
+@app.route('/exit_story', methods=['POST'])
+def exit_story():
+    return jsonify({'message': 'Adventure mode session ended successfully.'})
 
 
 if __name__ == '__main__':
