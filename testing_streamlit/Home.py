@@ -2,6 +2,7 @@ import streamlit as st
 from pathlib import Path
 from CreateStory import main as create_story_main
 from History import main as history_main
+from AdventureMode import main as adventure_mode_main
 
 # Define the path to the image in the utils folder and convert it to a string
 image_path = str(Path(__file__).parent / "utils" / "storybook-image.jpg")
@@ -65,7 +66,7 @@ st.markdown("""
 
 # Display the navigation bar using buttons
 st.markdown("<div class='navbar'>", unsafe_allow_html=True)
-col1, col2, col3 = st.columns([1, 1, 1])
+col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
 with col1:
     if st.button("Home"):
@@ -76,6 +77,9 @@ with col2:
 with col3:
     if st.button("History"):
         switch_page("history")
+with col4:
+    if st.button("Adventure Mode"):
+        switch_page("adventure")
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Page routing based on session state
@@ -102,3 +106,7 @@ elif page == "create":
 elif page == "history":
     # Call the History page
     history_main()
+
+elif page == "adventure":
+    # Call the AdventureMode page
+    adventure_mode_main()
