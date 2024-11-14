@@ -104,6 +104,13 @@ class StoryDatabase:
             print(f"Error fetching all stories: {e}")
             return None
 
-                    
+    def delete_story(self, story_id):
+        try:
+            query = "DELETE FROM story_data WHERE story_id = ?"
+            self.sqlconn.execute(query, (story_id,))
+            self.sqlconn.commit()
+        except sqlite3.Error as e:
+            print(f"Error deleting story: {e}")
+
     def close(self):
         self.sqlconn.close()
