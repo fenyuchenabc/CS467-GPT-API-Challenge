@@ -15,7 +15,6 @@ class Author:
                         choose your own adventure style stories giving the child
                         the option to select various paths in a story. Stories should vary
                         based on genre and age of the child"""
-        self.db = None  # Initialize self.db
         
         try:
             self.client = OpenAI(api_key=os.getenv("GPT_API_KEY")) #whatever our key is
@@ -25,14 +24,10 @@ class Author:
                     model = 'gpt-4o-mini-2024-07-18' #whatever model we end up using
                 )
             self.thread = self.create_thread()
-        except Exception as e:
-            print(f"Error initializing Author: {e}")
 
-        # Ensure self.db is always initialized
-        try:
             self.db = StoryDatabase()
         except Exception as e:
-            print(f"Error initializing StoryDatabase: {e}")
+            print(f"Error initializing Author: {e}")
 
     def create_thread(self):
         try:
