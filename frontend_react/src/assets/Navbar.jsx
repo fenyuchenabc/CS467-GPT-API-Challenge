@@ -1,15 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
-function Navbar() {
+
+const Navbar = () => {
+  const navigate = useNavigate();
   return (
     <nav className="navbar">
       <div className="logo">StoryBook GPT</div>
       <ul className="nav-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/newstory">Create New Story</Link></li>
-        <li><Link to="/history">History</Link></li>
+        <button onClick={() => navigate('/')}>Home</button>
+        <button onClick={() => navigate('/newstory')}>Create New Story</button>
+        <button onClick={() => navigate('/history')}>History</button>
+        <button onClick={() => navigate('/adventuremode')}>Adventure Mode</button>
       </ul>
     </nav>
   );

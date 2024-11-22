@@ -1,65 +1,73 @@
 .create-story-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .input-group {
-    margin-bottom: 20px;
-    text-align: left;
-  }
-  
-  .label {
-    font-size: 1rem;
-    margin-bottom: 8px;
-    display: block;
-  }
-  
-  .dropdown {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .textarea {
-    width: 100%;
-    height: 120px;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    resize: vertical;
-  }
-  
-  .submit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 20px;
-    background-color: #6c63ff;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .submit-btn:hover {
-    background-color: #5848c2;
-  }
-  
+  max-width: 700px; /* Increased width for a Streamlit-like feel */
+  margin: 50px auto; /* Added vertical margin for spacing */
+  padding: 30px;
+  text-align: center;
+  background-color: #ffffff; /* Clean white background */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #4a4a4a; /* Darker font color */
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.label {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  display: block;
+  color: #555; /* Softer label color */
+}
+
+.dropdown,
+.textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #f9f9f9; /* Light background for inputs */
+  transition: border-color 0.3s ease;
+}
+
+.dropdown:focus,
+.textarea:focus {
+  border-color: #6c63ff; /* Highlight border on focus */
+  outline: none;
+}
+
+.textarea {
+  height: 150px; /* Adjusted height for better writing experience */
+  resize: vertical;
+}
+
+.submit-btn {
+  display: inline-block;
+  padding: 15px 30px;
+  background-color: #4a4a4a; /* Dark gray button */
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+  background-color: #6c63ff; /* Bright blue hover effect */
+  transform: scale(1.05); /* Slight scaling for interactivity */
+}
+
+.submit-btn:active {
+  transform: scale(1); /* Return to normal size on click */
+}
