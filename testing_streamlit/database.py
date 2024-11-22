@@ -16,18 +16,19 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            image_url TEXT
         )
     ''')
     conn.commit()
     conn.close()
 
-def save_story(title, content):
+def save_story(title, content, image_url=None):
     """Save a generated story to the database."""
     try:
         conn = get_db_connection()
         print(f"Saving story to DB: title={title}, content={content[:100]}...")  # Print first 100 chars
-        conn.execute('INSERT INTO stories (title, content) VALUES (?, ?)', (title, content))
+        conn.execute('INSERT INTO stories (title, content, image_url) VALUES (?, ?, ?)', (title, content, image_url))
         conn.commit()
         conn.close()
     except Exception as e:
