@@ -1,36 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './History.css';
 
 function History() {
   // attribute id for each story
-  const [stories, setStories] = useState([
-    { id: 1, title: "story1" },
-    { id: 2, title: "story2" },
-    { id: 3, title: "story3" },
-    { id: 4, title: "story4" },
-    { id: 5, title: "story5" },
-    { id: 6, title: "story6" },
-    { id: 7, title: "story7" },
-    { id: 8, title: "story8" },
-    { id: 9, title: "story9" },
-    { id: 10, title: "story10" },
-    { id: 11, title: "story11" },
-    { id: 12, title: "story12" }
-  ]);
+  const [stories, setStories] = useState([]); // Empty array to hold stories
+  const [error, setError] = useState(null);  // Track errors
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/api/stories'); // Update the URL if needed
+        setStories(response.data); // Assuming the API returns an array of stories
+      } catch (err) {
+        console.error('Error fetching stories:', err);
+        setError('Failed to load stories. Please try again later.');
+      }
+    };
+
+    fetchStories();
+  }, []);
 
   return (
     <div className="history-container">
       <h2 className="title">History</h2>
+      {error ? (
+        <p className="error">{error}</p> // Display error message if API fails
+      ) : (
       <ul className="story-list">
         {stories.map((story) => (
-          <li key={story.id} className="story-item">
-            <Link to={`/story/${story.id}`} className="story-link">
-              <span role="img" aria-label="book">📖</span> {story.title}
+          <li key={story.story_id} className="story-item">
+            <Link to={`/story/${story.story_id}`} className="story-link">
+              <span role="img" aria-label="book">📖</span> {story.genre} - {story.content.slice(0, 50)}...
             </Link>
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

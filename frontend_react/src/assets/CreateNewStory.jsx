@@ -9,6 +9,8 @@ function CreateNewStory() {
   const [storyText, setStoryText] = useState('');
   const [storyContent, setStoryContent] = useState('');
   const [isStoryActive, setIsStoryActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handlePageChange = (e) => setPageCount(e.target.value);
   const handleGenreChange = (e) => setGenre(e.target.value);
@@ -17,6 +19,8 @@ function CreateNewStory() {
   const handleStoryChange = (e) => setStoryText(e.target.value);
 
   const handleStartStory = async () => {
+    setLoading(true);
+    setError(null);
     const response = await fetch('http://localhost:5000/api/start-story', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,6 +32,8 @@ function CreateNewStory() {
   };
 
   const handleContinueStory = async () => {
+    setLoading(true);
+    setError(null);
     const response = await fetch('http://localhost:5000/api/continue-story', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,6 +45,8 @@ function CreateNewStory() {
   };
 
   const handleSaveStory = async () => {
+    setLoading(true);
+    setError(null);
     const response = await fetch('http://localhost:5000/api/save-story', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
