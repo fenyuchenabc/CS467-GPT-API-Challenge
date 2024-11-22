@@ -22,7 +22,7 @@ def main():
 
     # Start story and display initial content with options
     if st.button("Start Story"):
-        response = requests.post("http://localhost:5000/start_story", json={
+        response = requests.post("http://127.0.0.1:5000/start_story", json={
             "genre": genre,
             "age": age,
             "page_count": segment_count,
@@ -48,7 +48,7 @@ def main():
         for i, option in enumerate(st.session_state["options"], 1):
             if st.button(f"Option {i}"):
                 # Send selected option to backend with session_id
-                response = requests.post("http://localhost:5000/continue_story", json={
+                response = requests.post("http://127.0.0.1:5000/continue_story", json={
                     "user_input": str(i),
                     "session_id": st.session_state["session_id"]
                 })

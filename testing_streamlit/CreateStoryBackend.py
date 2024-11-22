@@ -38,6 +38,17 @@ what settings in the story look like as well.
             return response.choices[0].message.content
         except Exception as e:
             return f"Error: {str(e)}"
+    
+    def generate_image(self, description):
+        try:
+            response = self.client.images.generate(
+                prompt=description,
+                n=1,
+                size="512x512"
+            )
+            return response.data[0].url
+        except Exception as e:
+            return f"Error generating image: {str(e)}"
 
     def first_page(self, prompt, pages):
         command = f"Write a story about {prompt}. Make sure it is exactly {pages} page(s) long, one page is around 300 words and please no page number in the contents"
@@ -62,18 +73,29 @@ agent = Author()
 def create_story():
     try:
         # Get user input from request
+        print("Request received at backend")
         data = request.json
+        print("Request data:", data)
         prompt = data.get('prompt')
         pages = data.get('pages')
+        print("Prompt:", prompt, "Pages:", pages)
 
         # Validate input
         if not pages or not prompt:
+            print("Validation failed: Missing 'pages' or 'prompt'")
             return jsonify({"error": "Missing 'pages' or 'prompt'"}), 400
 
         # Generate the first page of the story
+        print("Generating story...")
         story = agent.first_page(pages, prompt)
-        save_story(prompt, story)
-        return jsonify({'story': story})
+        print("Generated story:", story)
+
+        # Generate an image related to the story
+        image_description = f"A vivid illustration of the story: {prompt}"
+        image_url = agent.generate_image(image_description)
+
+        save_story(prompt, story, image_url)
+        return jsonify({'story': story, 'image_url': image_url})
 
     except Exception as e:
         return jsonify({"error": f"Unexpected server error: {str(e)}"}), 500
@@ -81,7 +103,15 @@ def create_story():
 @app.route('/get_stories', methods=['GET'])
 def get_stories():
     stories = get_all_stories()
-    stories_list = [{'id': story['id'], 'title': story['title'], 'content': story['content']} for story in stories]
+    stories_list = [
+        {
+        'id': story['id'], 
+        'title': story['title'], 
+        'content': story['content'],
+        'image_url': story['image_url']
+        } 
+        for story in stories
+    ]
     return jsonify(stories_list)
 
 # Define the /start_story route for Adventure Mode

@@ -17,6 +17,14 @@ def main():
                 for story in stories:
                     with st.expander(f"📖 {story['title']}"):
                         st.write(story['content'])
+                    # Display the image if the image_url exists
+                    image_url = story.get('image_url')
+                    if image_url and image_url.startswith("http"):
+                        st.image(image_url, caption=f"Illustration for {story['title']}", use_column_width=True)
+                    elif image_url:
+                        st.warning(f"Image generation failed: {image_url}")
+                    else:
+                        st.warning("No image available for this story.")
             else:
                 st.info("No stories found in the database.")
         else:

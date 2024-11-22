@@ -20,7 +20,10 @@ def main():
             if response.status_code == 200:
                 story = response.json().get("story", "")
                 st.success("Story generated successfully!")
+                image_url = response.json().get("image_url", "")
                 st.write(story)
+                st.image(image_url, caption="Generated Illustration", use_column_width=True)
+
             else:
                 st.error("Failed to generate story. Try again.")
         else:
