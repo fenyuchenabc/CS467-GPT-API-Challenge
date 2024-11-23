@@ -1,37 +1,67 @@
 import streamlit as st
 import requests
+from dotenv import load_dotenv
+import os
 
-def main():
-    st.title("History")
-    st.subheader("Click on a story to view the full content")
-    
+# Load environment variables
+load_dotenv()
 
-    # Fetch stories from the backend
+# Backend API base URL
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:5000")
+
+def fetch_stories():
+    """
+    Fetches the list of stories from the backend.
+
+    Returns:
+    - list[dict]: A list of story dictionaries if successful.
+    - None: If an error occurs or the request fails.
+    """
     try:
-        response = requests.get("http://127.0.0.1:5000/get_stories")
+        response = requests.get(f"{API_BASE_URL}/api/stories")
         if response.status_code == 200:
-            stories = response.json()
-
-            if stories:
-                # Display titles as clickable expanders
-                for story in stories:
-                    with st.expander(f"📖 {story['title']}"):
-                        st.write(story['content'])
-                    # Display the image if the image_url exists
-                    image_url = story.get('image_url')
-                    if image_url and image_url.startswith("http"):
-                        st.image(image_url, caption=f"Illustration for {story['title']}", use_column_width=True)
-                    elif image_url:
-                        st.warning(f"Image generation failed: {image_url}")
-                    else:
-                        st.warning("No image available for this story.")
-            else:
-                st.info("No stories found in the database.")
+            return response.json()
         else:
-            st.error("Failed to retrieve stories. Please try again.")
-
+            st.error(f"Error: Received status code {response.status_code} from the server.")
+            return None
     except requests.exceptions.RequestException as e:
         st.error(f"Failed to connect to the backend: {e}")
+        return None
+
+def display_story(story):
+    """
+    Displays a single story in an expander widget.
+
+    Parameters:
+    - story (dict): A dictionary containing the story details.
+    """
+    title = story.get("title", "Untitled Story")
+    content = story.get("content", "No content available.")
+    image_url = story.get("image_url")
+
+    with st.expander(f"📖 {title}"):
+        st.write(content)
+        if image_url and image_url.startswith("http"):
+            st.image(image_url, caption=f"Illustration for {title}", use_column_width=True)
+        elif image_url:
+            st.warning(f"Image generation failed: {image_url}")
+        else:
+            st.warning("No image available for this story.")
+
+def main():
+    """
+    Main function to render the History page in the Streamlit app.
+    """
+    st.title("History")
+    st.subheader("Click on a story to view the full content")
+
+    # Fetch and display stories
+    stories = fetch_stories()
+    if stories:
+        for story in stories:
+            display_story(story)
+    elif stories is not None:
+        st.info("No stories found in the database.")
 
 if __name__ == "__main__":
     main()
