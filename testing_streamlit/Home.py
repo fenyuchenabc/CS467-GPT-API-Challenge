@@ -8,86 +8,55 @@ from AdventureMode import main as adventure_mode_main
 image_path = str(Path(__file__).parent / "utils" / "storybook-image.jpg")
 
 # Initialize session state for page navigation
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'home'
+def initialize_session_state():
+    if 'page' not in st.session_state:
+        st.session_state['page'] = 'home'
+
+initialize_session_state()
 
 # Define a function to switch pages
 def switch_page(page_name):
     st.session_state['page'] = page_name
 
-# Custom CSS for the navigation bar
-st.markdown("""
-    <style>
-    /* Navigation Bar Container */
-    .navbar {
-        display: flex;
-        justify-content: center;
-        background-color: #4A4A4A;
-        padding: 10px;
-        font-family: 'Arial', sans-serif;
-    }
+# Load custom CSS
+def load_css(css_file):
+    """
+    Loads a CSS file to style the Streamlit app.
 
-    /* Navigation Bar Links */
-    .navbar button {
-        background: none;
-        color: #E5E5E5; /* Light color */
-        border: none;
-        margin: 0 20px; /* Spacing between links */
-        font-size: 18px; /* Font size */
-        padding: 8px 16px; /* Padding around links */
-        border-radius: 5px; /* Rounded corners */
-        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
-        cursor: pointer;
-    }
+    Parameters:
+    - css_file (str): Path to the CSS file.
+    """
+    try:
+        with open(css_file, "r") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error("Error: CSS file not found. Please check the file path.")
 
-    /* Active and Hover Effects for Links */
-    .navbar button:hover {
-        background-color: #E5E5E5; /* Light color on hover */
-        color: #4A4A4A; /* Dark text color on hover */
-    }
+# Load CSS from utils folder
+css_path = Path(__file__).parent / "utils" / "styles.css"
+load_css(css_path)
 
-    /* Centering welcome message */
-    .welcome {
-        text-align: center;
-        margin-top: 30px;
-        font-family: 'Arial', sans-serif;
-    }
+# Define the path to the image in the utils folder
+image_path = Path(__file__).parent / "utils" / "storybook-image.jpg"
+if not image_path.exists():
+    st.error("Error: Storybook image not found. Please check the file path.")
 
-    /* Styling the image */
-    .storybook-image {
-        display: block;
-        margin: 0 auto;
-        max-width: 80%;
-        border-radius: 15px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Navigation using a sidebar
+st.sidebar.title("Storybook GPT Navigation")
+page = st.sidebar.radio(
+    "Choose a page:",
+    ["Home", "Create New Story", "History", "Adventure Mode"],
+    index=["home", "create", "history", "adventure"].index(st.session_state["page"]),
+    key="page_selector",
+)
 
-# Display the navigation bar using buttons
-st.markdown("<div class='navbar'>", unsafe_allow_html=True)
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-
-with col1:
-    if st.button("Home"):
-        switch_page("home")
-with col2:
-    if st.button("Create New Story"):
-        switch_page("create")
-with col3:
-    if st.button("History"):
-        switch_page("history")
-with col4:
-    if st.button("Adventure Mode"):
-        switch_page("adventure")
-st.markdown("</div>", unsafe_allow_html=True)
-
-# Page routing based on session state
-page = st.session_state['page']
-
-if page == "home":
-    # Home page content
-    st.markdown("""
+# Route pages based on user selection
+def show_home_page():
+    """
+    Displays the home page with a welcome message and image.
+    """
+    st.markdown(
+        """
         <div class="welcome">
             <h1>Welcome to Storybook GPT</h1>
             <p style="font-size: 18px; max-width: 600px; margin: 0 auto;">
@@ -96,17 +65,23 @@ if page == "home":
                 Dive into the magical realm of AI-driven storytelling and let the adventures begin.
             </p>
         </div>
-    """, unsafe_allow_html=True)
-    st.image(image_path, use_column_width=True)
+        """,
+        unsafe_allow_html=True,
+    )
+    st.image(str(image_path), caption="Welcome to Storybook GPT", use_column_width=True)
 
-elif page == "create":
-    # Call the CreateStory page
-    create_story_main()
 
-elif page == "history":
-    # Call the History page
-    history_main()
+# Page dictionary for routing
+pages = {
+    "home": show_home_page,
+    "create": create_story_main,
+    "history": history_main,
+    "adventure": adventure_mode_main,
+}
 
-elif page == "adventure":
-    # Call the AdventureMode page
-    adventure_mode_main()
+# Display the selected page
+try:
+    pages.get(page, show_home_page)()
+except Exception as e:
+    st.error(f"Error loading the page: {e}")
+    st.session_state["page"] = "home"
