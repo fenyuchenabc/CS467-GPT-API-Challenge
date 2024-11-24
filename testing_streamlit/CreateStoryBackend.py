@@ -15,6 +15,9 @@ init_db()
 # Global dictionary to hold story context per session
 story_contexts = {}
 
+# Global counter for segments on choose your own adventure
+SEGMENT_COUNTER = 1
+
 class Author:
     def __init__(self):
         writer_job = """You are an accomplished children's story writer. You like to write with a style that is appropriate for children but 
@@ -61,9 +64,13 @@ what settings in the story look like as well.
                       and move to the next only after the reader chooses. Limit the story to {segment_count} segments overall."""
         return self.execute(command)
 
-    def continue_adventure_story(self, previous_context, user_input):
-        command = f"{previous_context} The user chose option {user_input}. Continue the story from here."
-        return self.execute(command)
+    def continue_adventure_story(self, previous_context, user_input, choice_count, segment_count):
+        global SEGMENT_COUNTER
+        SEGMENT_COUNTER += 1
+        segment = str(SEGMENT_COUNTER)
+        command = f"""{previous_context} The user chose option {user_input}. Continue the story from here.
+                    The reader asked for the story to be {segment_count} segments and you are currently on 
+                    segment {segment}. Provide {choice_count} choices per story segment."""
 
 
 agent = Author()
@@ -141,6 +148,8 @@ def continue_story():
     data = request.json
     user_input = data.get('user_input')
     session_id = data.get('session_id')
+    choice_count = data.get('choice_count')
+    page_count = data.get('page_count')
 
     if not user_input or not session_id:
         return jsonify({"error": "Missing 'user_input' or 'session_id'"}), 400
@@ -151,7 +160,7 @@ def continue_story():
         return jsonify({"error": "Invalid session_id"}), 400
 
     # Continue the story based on the user's choice
-    story = agent.continue_adventure_story(previous_context, user_input)
+    story = agent.continue_adventure_story(previous_context, user_input, choice_count, page_count)
 
     # Update the story context with the new part of the story
     story_contexts[session_id] = previous_context + f" User chose option {user_input}. " + story
