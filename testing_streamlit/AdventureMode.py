@@ -38,7 +38,8 @@ def main():
             st.write("Story started successfully!")
             st.write(st.session_state["story"])
         else:
-            st.error("Failed to start the story. Try again.")
+            st.error(f"Failed to start the story. Error: {response.text}")
+
 
     # Check if story, options, and session_id are set in session state
     if st.session_state["story"] and st.session_state["options"] and st.session_state["session_id"]:
