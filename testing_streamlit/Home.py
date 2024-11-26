@@ -4,11 +4,11 @@ from CreateStory import main as create_story_main
 from History import main as history_main
 from AdventureMode import main as adventure_mode_main
 
-# Define the path to the image in the utils folder and convert it to a string
-image_path = str(Path(__file__).parent / "utils" / "storybook-image.jpg")
-
 # Initialize session state for page navigation
 def initialize_session_state():
+    """
+    Initialize the session state for page navigation if not already set.
+    """
     if 'page' not in st.session_state:
         st.session_state['page'] = 'home'
 
@@ -16,6 +16,12 @@ initialize_session_state()
 
 # Define a function to switch pages
 def switch_page(page_name):
+    """
+    Updates the session state to the selected page.
+    
+    Parameters:
+    - page_name (str): The name of the page to switch to.
+    """
     st.session_state['page'] = page_name
 
 # Load custom CSS
@@ -43,12 +49,22 @@ if not image_path.exists():
 
 # Navigation using a sidebar
 st.sidebar.title("Storybook GPT Navigation")
-page = st.sidebar.radio(
+page_options = {
+    "Home": "home",
+    "Create New Story": "create",
+    "History": "history",
+    "Adventure Mode": "adventure",
+}
+selected_page = st.sidebar.radio(
     "Choose a page:",
-    ["Home", "Create New Story", "History", "Adventure Mode"],
-    index=["home", "create", "history", "adventure"].index(st.session_state["page"]),
-    key="page_selector",
+    options=list(page_options.keys()),
+    index=list(page_options.values()).index(st.session_state["page"]),
 )
+
+# Add a "Go" button in the sidebar to confirm the selection
+if st.sidebar.button("Go"):
+    # Update the session state with the selected page
+    switch_page(page_options[selected_page])
 
 # Route pages based on user selection
 def show_home_page():
@@ -81,7 +97,7 @@ pages = {
 
 # Display the selected page
 try:
-    pages.get(page, show_home_page)()
+    pages[st.session_state["page"]]()
 except Exception as e:
-    st.error(f"Error loading the page: {e}")
+    st.error(f"Error loading the page: {st.session_state['page']}")
     st.session_state["page"] = "home"
