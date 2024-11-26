@@ -26,7 +26,7 @@ def start_story():
     - key_moments (list[str], optional): Key moments to include in the story.
 
     Returns:
-    - JSON with the first page of the story.
+    - JSON with the first page of the story and the generated title.
     """
     try:
         data = request.get_json()
@@ -39,6 +39,14 @@ def start_story():
         page_count = data['page_count']
         key_moments = data.get('key_moments')
 
+        # Extract the title from the first line of the story
+        story = agent.first_page(genre, age, choice_count, page_count, key_moments)
+        title = story.split("\n")[0].strip()
+        if not title.startswith("Title: "):  # Validate title prefix
+            title = "Untitled Story"
+        else:
+            title = title.replace("Title: ", "").strip()
+            
         response = agent.first_page(genre, age, choice_count, page_count, key_moments)
         return jsonify({"content": response}), 200
     except Exception as e:
