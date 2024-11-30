@@ -6,7 +6,7 @@ import os
 import uuid
 import logging
 
-# Set api key
+# Set API key
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -17,23 +17,20 @@ init_db()
 # Global dictionary to hold story context per session
 story_contexts = {}
 
-# Global counter for segments on choose your own adventure
-SEGMENT_COUNTER = 1
-
 class Author:
     def __init__(self):
         """
         Represents a story author using OpenAI.
         """
         self.writer_job = """You are an accomplished children's story writer. You like to write with a style that is appropriate for children but 
-is still interesting to read. Your job is to create stories. Along with the 
-story, write an extensive description of each character's detailed description, and any other significant characteristics. Write an extensive description of 
-what settings in the story look like as well.
-"""
+        is still interesting to read. Your job is to create stories. Along with the 
+        story, write an extensive description of each character's detailed description, and any other significant characteristics. Write an extensive description of 
+        what settings in the story look like as well.
+        """
         # Set OpenAI API key
         self.client = OpenAI(api_key=os.getenv("GPT_API_KEY"))
-        self.model = 'gpt-4o-mini-2024-07-18'  
-    
+        self.model = 'gpt-4o-mini-2024-07-18'
+
     def execute(self, text_input):
         """
         Executes a prompt using OpenAI's GPT model.
@@ -54,12 +51,9 @@ what settings in the story look like as well.
             )
             return response.choices[0].message.content
         except OpenAIError as e:
-            logging.error(f"OpenAI API error: {e}")
             return f"Error: {str(e)}"
         except Exception as e:
-            logging.error(f"Unexpected error: {e}")
             return f"Error: {str(e)}"
-    
     def generate_image(self, description):
         """
         Generates an image using OpenAI's image generation API.
@@ -98,7 +92,7 @@ what settings in the story look like as well.
         command = f"Write a story about {prompt}. Make sure it is exactly {pages} page(s) long, one page is around 300 words and please no page number in the contents"
         response = self.execute(command)
         return response
-
+        
     def start_adventure_story(self, genre, age, choice_count, segment_count):
         """
         Generates the first segment of an adventure story.
@@ -108,17 +102,16 @@ what settings in the story look like as well.
                       and move to the next only after the reader chooses. Limit the story to {segment_count} segments overall."""
         return self.execute(command)
 
-    def continue_adventure_story(self, previous_context, user_input, choice_count, segment_count):
+    def continue_adventure_story(self, previous_context, user_input, choice_count, segment_count, segment_counter):
         """
         Continues an adventure story based on user input.
         """
-        global SEGMENT_COUNTER
-        SEGMENT_COUNTER += 1
-        segment = str(SEGMENT_COUNTER)
-        command = f"""{previous_context} The user chose option {user_input}. Continue the story from here.
-                    The reader asked for the story to be {segment_count} segments and you are currently on 
-                    segment {segment}. Provide {choice_count} choices per story segment."""
-
+        command = f"""{previous_context} The user chose option {user_input}."""
+        if segment_count == segment_counter:
+            command += f"""Make this next segment the final segment and end the story without providing any choices. End with "The End!"."""
+        else:
+            command += f""" Continue the story from here with a single segment and provide {choice_count} choices."""
+        return self.execute(command)
 
 agent = Author()
 
@@ -171,7 +164,6 @@ def get_stories():
     ]
     return jsonify(stories_list)
 
-# Define the /start_story route for Adventure Mode
 @app.route('/start_story', methods=['POST'])
 def start_story():
     data = request.json
@@ -188,11 +180,13 @@ def start_story():
 
     # Create a unique session ID and store the story context
     session_id = str(uuid.uuid4())
-    story_contexts[session_id] = story  # Store initial story in context
+    story_contexts[session_id] = {
+        "story": story,
+        "segment_counter": 1  # Start at 1 instead of 0
+    }
 
     return jsonify({'session_id': session_id, 'story': story})
 
-# Define the /continue_story route for continuing Adventure Mode
 @app.route('/continue_story', methods=['POST'])
 def continue_story():
     data = request.json
@@ -205,19 +199,22 @@ def continue_story():
         return jsonify({"error": "Missing 'user_input' or 'session_id'"}), 400
 
     # Retrieve the previous story context
-    previous_context = story_contexts.get(session_id, "")
-    if not previous_context:
+    session_data = story_contexts.get(session_id)
+    if not session_data:
         return jsonify({"error": "Invalid session_id"}), 400
 
+    previous_context = session_data["story"]
+    segment_counter = session_data["segment_counter"]
+
     # Continue the story based on the user's choice
-    story = agent.continue_adventure_story(previous_context, user_input, choice_count, page_count)
+    story = agent.continue_adventure_story(previous_context, user_input, choice_count, page_count, segment_counter)
 
     # Update the story context with the new part of the story
-    story_contexts[session_id] = previous_context + f" User chose option {user_input}. " + story
+    session_data["story"] = previous_context + f" User chose option {user_input}. " + story
+    session_data["segment_counter"] += 1  # Increment the segment counter
 
     return jsonify({'story': story})
 
-# Define the /exit_story route for Adventure Mode
 @app.route('/exit_story', methods=['POST'])
 def exit_story():
     session_id = request.json.get('session_id')
