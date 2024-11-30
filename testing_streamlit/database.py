@@ -28,7 +28,7 @@ def init_db():
     Creates a 'stories' table if it does not already exist.
     """
     try:
-        with get_db_connection as conn:
+        with get_db_connection() as conn:
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS stories (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,

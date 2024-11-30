@@ -19,7 +19,7 @@ def fetch_stories():
     - None: If an error occurs or the request fails.
     """
     try:
-        response = requests.get(f"{API_BASE_URL}/api/stories")
+        response = requests.get(f"{API_BASE_URL}/get_stories")
         if response.status_code == 200:
             return response.json()
         else:
