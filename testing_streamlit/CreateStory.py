@@ -42,7 +42,7 @@ def main():
 
                 # Display the generated image if available
                 if image_url:
-                    st.image(image_url, caption="Generated Illustration", use_column_width=True)
+                    st.image(image_url, caption="Generated Illustration", use_container_width=True)
                 else:
                     st.warning("No image was generated for this story.")
             else:
