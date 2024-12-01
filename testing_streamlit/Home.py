@@ -84,7 +84,7 @@ def show_home_page():
         """,
         unsafe_allow_html=True,
     )
-    st.image(str(image_path), caption="Welcome to Storybook GPT", use_column_width=True)
+    st.image(str(image_path), caption="Welcome to Storybook GPT", use_container_width=True)
 
 
 # Page dictionary for routing
